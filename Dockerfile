@@ -1,7 +1,8 @@
-FROM node:hydrogen-alpine3.21
+FROM node:18-alpine AS installer
 WORKDIR /app
+COPY package*.json ./
+RUN npm install 
 COPY . .
-RUN npm install
-EXPOSE 3000
-CMD ["npm", "start"]
-
+RUN npm run build
+FROM nginx:latest AS deployer
+COPY --from=installer /app/build /usr/share/nginx/html
